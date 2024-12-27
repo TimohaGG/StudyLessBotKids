@@ -4,7 +4,7 @@ FROM openjdk:17-jdk
 WORKDIR /app
 
 # Copy the Maven or Gradle build artifact (JAR) to the container
-COPY target/*.jar app.jar
+COPY target/*.jar StudyLessBot-0.0.1-SNAPSHOT.jar
 
 # Expose the port the app will run on (Spring Boot defaults to port 8080)
 EXPOSE 8080
