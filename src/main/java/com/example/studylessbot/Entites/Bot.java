@@ -10,6 +10,8 @@ import org.telegram.telegrambots.meta.api.objects.polls.Poll;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Bot extends TelegramLongPollingBot {
 
@@ -37,6 +39,18 @@ public class Bot extends TelegramLongPollingBot {
             Message message = update.getMessage();
             String chatName = message.getChat().getTitle(); // Get the chat ID of the message
 
+            Pattern pattern = Pattern.compile("\\,(\\d+)");
+            Matcher matcher = pattern.matcher(chatName);
+            if(matcher.find()) {
+                chatName = matcher.group(1);
+            }
+            else{
+                pattern = Pattern.compile("група\\s*(\\d+)");
+                matcher = pattern.matcher(chatName);
+                if(matcher.find()) {
+                    chatName = matcher.group(1);
+                }
+            }
 
             if(message.hasPoll()){
                 com.example.studylessbot.Entites.Message messageToSave = new com.example.studylessbot.Entites.Message();

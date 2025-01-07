@@ -38,7 +38,7 @@ public class MainController {
 
     @GetMapping("/")
     public String index(@Nullable String groupName, Model model) {
-        List<Message> messages = messageService.getAllMessages().stream().sorted(Comparator.comparing(Message::getDate)).toList();
+            List<Message> messages = messageService.getAllMessages().stream().sorted(Comparator.comparing(Message::getDate)).toList();
         messages = messages.stream()
                 .filter(x->x.getDateRaw().getMonth()==new Date().getMonth())
                 .toList();
