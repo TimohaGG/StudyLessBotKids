@@ -1,21 +1,23 @@
 package com.example.studylessbot.Entites;
 
+import com.example.studylessbot.Controllers.MainController;
 import com.example.studylessbot.Services.MessagesService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.polls.Poll;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.*;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Bot extends TelegramLongPollingBot {
 
-    private Map<String,MessageType> tags = Map.ofEntries(
+    private final Map<String,MessageType> tags = Map.ofEntries(
             new AbstractMap.SimpleEntry<>("coins",MessageType.COINS) ,
             new AbstractMap.SimpleEntry<>("weeklytask",MessageType.WEEKLY_TASK) ,
             new AbstractMap.SimpleEntry<>("invitation",MessageType.INVITATION) ,
@@ -25,6 +27,7 @@ public class Bot extends TelegramLongPollingBot {
     );
 
     MessagesService messagesService;
+
     public Bot() {}
 
 
@@ -35,47 +38,69 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && (update.getMessage().hasText()||update.getMessage().hasPoll())) {
+        try{
+
+            if(!update.hasMessage()){
+                return;
+            }
+
             Message message = update.getMessage();
-            String chatName = message.getChat().getTitle(); // Get the chat ID of the message
-
-            Pattern pattern = Pattern.compile("\\,(\\d+)");
-            Matcher matcher = pattern.matcher(chatName);
-            if(matcher.find()) {
-                chatName = matcher.group(1);
-            }
-            else{
-                pattern = Pattern.compile("група\\s*(\\d+)");
-                matcher = pattern.matcher(chatName);
-                if(matcher.find()) {
-                    chatName = matcher.group(1);
-                }
-            }
-
+            String chatName = extractChat(message.getChat().getTitle());
+            List<ChatMessage> msgs = new ArrayList<>();
+            ChatMessage tmp = new ChatMessage();
+            tmp.setDate(new Date((long    )message.getDate()*1000));
+            tmp.setGroupNumber(chatName);
             if(message.hasPoll()){
-                com.example.studylessbot.Entites.Message messageToSave = new com.example.studylessbot.Entites.Message();
-                messageToSave.setMessageType(MessageType.POLL);
-                messageToSave.setDate(new Date((long    )message.getDate()*1000));
-                messageToSave.setGroupNumber(chatName);
-                messagesService.addMessage(messageToSave);
+                tmp.setMessageType(MessageType.POLL);
+                msgs.add(tmp);
+                MainController.logger.log(Level.INFO,"Poll added!");
             }
-            else{
-                for (Map.Entry<String,MessageType> entry : tags.entrySet()) {
-                    if(message.getText().contains("#"+entry.getKey())) {
-                        com.example.studylessbot.Entites.Message messageToSave = new com.example.studylessbot.Entites.Message();
-                        messageToSave.setMessageType(entry.getValue());
-
-                        messageToSave.setDate(new Date((long    )message.getDate()*1000));
-                        messageToSave.setGroupNumber(chatName);
-                        messagesService.addMessage(messageToSave);
+            if(message.hasText()||message.hasPhoto()||message.hasDocument()||message.hasVideo())
+            {
+                String text = message.hasText()?message.getText():message.getCaption();
+                Pattern pattern = Pattern.compile("#(\\w+)");
+                Matcher matcher = pattern.matcher(text);
+                while(matcher.find()){
+                    if(tags.containsKey(matcher.group(1))){
+                        tmp.setMessageType(tags.get(matcher.group(1)));
+                        msgs.add(tmp);
+                        MainController.logger.log(Level.INFO,"Added tag: " + matcher.group(1));
                     }
 
                 }
+
+
             }
+            for (ChatMessage chatMessage : msgs) {
+                ChatMessage res = messagesService.addMessage(chatMessage);
+                if(res==null){
+                    MainController.logger.log(Level.SEVERE,"Error while adding chat message: " + chatMessage.getMessageType());
+                }
+            }
+
+
+        }catch (Exception e){
+           MainController.logger.log(Level.WARNING, e.getMessage(),e);
 
         }
 
 
+    }
+
+    private String extractChat(String chatName){
+        Pattern pattern = Pattern.compile("\\,(\\d+)");
+        Matcher matcher = pattern.matcher(chatName);
+        if(matcher.find()) {
+            chatName = matcher.group(1);
+        }
+        else{
+            pattern = Pattern.compile("група\\s*(\\d+)");
+            matcher = pattern.matcher(chatName);
+            if(matcher.find()) {
+                chatName = matcher.group(1);
+            }
+        }
+        return chatName;
     }
 
 
@@ -90,5 +115,7 @@ public class Bot extends TelegramLongPollingBot {
         // TODO
         return "7712861655:AAGsdpMocRxgtaNVUqCkE8XS7pP92dbTKyc";
     }
+
+
 
 }

@@ -1,6 +1,6 @@
 package com.example.studylessbot.Services;
 
-import com.example.studylessbot.Entites.Message;
+import com.example.studylessbot.Entites.ChatMessage;
 import com.example.studylessbot.Repos.MessagesRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,13 +15,16 @@ public class MessagesService {
         this.messagesRepos = messagesRepos;
     }
 
-    public List<Message> getAllMessages() {
+    public List<ChatMessage> getAllMessages() {
         return messagesRepos.findAll();
     }
 
-    public boolean addMessage(Message message) {
-        messagesRepos.save(message);
-        return true;
+    public ChatMessage addMessage(ChatMessage message) {
+        return messagesRepos.save(message);
+    }
+
+    public void addAllMessages(List<ChatMessage> messages) {
+        messagesRepos.saveAll(messages);
     }
 
 

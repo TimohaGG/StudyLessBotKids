@@ -1,11 +1,8 @@
 package com.example.studylessbot.Controllers;
 
-import com.example.studylessbot.Entites.Bot;
-import com.example.studylessbot.Entites.Message;
+import com.example.studylessbot.Entites.ChatMessage;
 import com.example.studylessbot.Entites.MessageType;
 import com.example.studylessbot.Services.MessagesService;
-import com.mysql.cj.protocol.MessageSender;
-import jakarta.ws.rs.DefaultValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,15 +10,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
 @Controller
 public class MainController {
 
-    private MessagesService messageService;
+    public static final Logger logger = Logger.getLogger(MainController.class.getName());
+    private final MessagesService messageService;
     //private List<String> headers = List.of("Weekly task","Invitation","Poll","Presentation","Recording");
-    private Map<String, MessageType> headers = Map.ofEntries(
+    private final Map<String, MessageType> headers = Map.ofEntries(
             new AbstractMap.SimpleEntry<>("coins",MessageType.COINS) ,
             new AbstractMap.SimpleEntry<>("weeklytask",MessageType.WEEKLY_TASK) ,
             new AbstractMap.SimpleEntry<>("invitation",MessageType.INVITATION) ,
@@ -33,12 +33,14 @@ public class MainController {
 
     @Autowired
     public MainController(MessagesService messageService) {
+
+        logger.log(Level.INFO, "Initializing MainController");
         this.messageService = messageService;
     }
 
     @GetMapping("/")
     public String index(@Nullable String groupName, Model model) {
-            List<Message> messages = messageService.getAllMessages().stream().sorted(Comparator.comparing(Message::getDate)).toList();
+            List<ChatMessage> messages = messageService.getAllMessages().stream().sorted(Comparator.comparing(ChatMessage::getDate)).toList();
         messages = messages.stream()
                 .filter(x->x.getDateRaw().getMonth()==new Date().getMonth())
                 .toList();
@@ -47,11 +49,11 @@ public class MainController {
             messages = messages.stream().filter(x->x.getGroupNumber().contains(groupName)).toList();
         }
 
-        Map<String, Map<String, List<Message>>> groupedMessages = messages.stream()
+        Map<String, Map<String, List<ChatMessage>>> groupedMessages = messages.stream()
                 .collect(Collectors.groupingBy(
-                        Message::getGroupNumber, // Outer map key by groupName
+                        ChatMessage::getGroupNumber, // Outer map key by groupName
                         Collectors.groupingBy( // Inner map key by date, grouping by message
-                                Message::getDate // Group by date
+                                ChatMessage::getDate // Group by date
                         )
                 ));
 

@@ -10,7 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 @Entity
-public class Message {
+public class ChatMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
@@ -22,12 +22,15 @@ public class Message {
     private String groupNumber;
 
 
-    public Message() {
+    public ChatMessage() {
 
     }
 
+    public long getId() {
+        return id;
+    }
 
-    public Message(MessageType messageType, Date date, String groupNumber) {
+    public ChatMessage(MessageType messageType, Date date, String groupNumber) {
         this.messageType = messageType;
         this.date = date;
         this.groupNumber = groupNumber;
