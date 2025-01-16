@@ -1176,3 +1176,21 @@ INFO: Starting ProtocolHandler ["http-nio-8081"]
 INFO: Poll added!
 січ. 11, 2025 1:11:28 ПП org.apache.catalina.core.ApplicationContext log
 INFO: Initializing Spring DispatcherServlet 'dispatcherServlet'
+січ. 11, 2025 1:17:36 ПП org.apache.coyote.AbstractProtocol init
+INFO: Initializing ProtocolHandler ["http-nio-8081"]
+січ. 11, 2025 1:17:36 ПП org.apache.catalina.core.StandardService startInternal
+INFO: Starting service [Tomcat]
+січ. 11, 2025 1:17:36 ПП org.apache.catalina.core.StandardEngine startInternal
+INFO: Starting Servlet engine: [Apache Tomcat/10.1.34]
+січ. 11, 2025 1:17:36 ПП org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring embedded WebApplicationContext
+січ. 11, 2025 1:17:38 ПП com.example.studylessbot.Controllers.MainController <init>
+INFO: Initializing MainController
+січ. 11, 2025 1:17:38 ПП org.apache.coyote.AbstractProtocol start
+INFO: Starting ProtocolHandler ["http-nio-8081"]
+січ. 11, 2025 1:17:52 ПП org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring DispatcherServlet 'dispatcherServlet'
+січ. 11, 2025 4:04:57 ПП com.example.studylessbot.Entites.Bot onUpdateReceived
+INFO: Added tag: invitation
+січ. 11, 2025 5:34:57 ПП com.example.studylessbot.Entites.Bot onUpdateReceived
+INFO: Added tag: invitation
