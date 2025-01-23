@@ -39,14 +39,21 @@ public class MainController {
     }
 
     @GetMapping("/")
-    public String index(@Nullable String groupName, Model model) {
+    public String index(@Nullable String groupName,@Nullable Date fromDate,@Nullable Date toDate, Model model) {
             List<ChatMessage> messages = messageService.getAllMessages().stream().sorted(Comparator.comparing(ChatMessage::getDate)).toList();
-        messages = messages.stream()
-                .filter(x->x.getDateRaw().getMonth()==new Date().getMonth())
-                .toList();
+
 
         if(groupName!=null) {
             messages = messages.stream().filter(x->x.getGroupNumber().contains(groupName)).toList();
+        }
+        if(fromDate!=null&&toDate!=null) {
+
+            messages = messages.stream()
+                    .filter(x->
+                            x.getDateRaw().getTime()>=fromDate.getTime())
+                    .filter(x->
+                            x.getDateRaw().getTime()<=toDate.getTime())
+                    .toList();
         }
 
         Map<String, Map<String, List<ChatMessage>>> groupedMessages = messages.stream()
