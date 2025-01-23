@@ -99,6 +99,14 @@ public class Bot extends TelegramLongPollingBot {
             if(matcher.find()) {
                 chatName = matcher.group(1);
             }
+            else{
+                pattern = Pattern.compile("SL KIDS\\s*(\\d+)");
+                matcher = pattern.matcher(chatName);
+                if(matcher.find()) {
+                    chatName = matcher.group(1);
+                }
+            }
+
         }
         return chatName;
     }
