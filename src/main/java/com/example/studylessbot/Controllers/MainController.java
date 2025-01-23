@@ -9,6 +9,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.annotation.Nullable;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,21 +42,32 @@ public class MainController {
     }
 
     @GetMapping("/")
-    public String index(@Nullable String groupName,@Nullable Date fromDate,@Nullable Date toDate, Model model) {
+    public String index(@Nullable String groupName,@Nullable String from,@Nullable String to, Model model) {
             List<ChatMessage> messages = messageService.getAllMessages().stream().sorted(Comparator.comparing(ChatMessage::getDate)).toList();
 
 
         if(groupName!=null) {
             messages = messages.stream().filter(x->x.getGroupNumber().contains(groupName)).toList();
         }
-        if(fromDate!=null&&toDate!=null) {
+        if(from!=null&&to!=null) {
 
-            messages = messages.stream()
-                    .filter(x->
-                            x.getDateRaw().getTime()>=fromDate.getTime())
-                    .filter(x->
-                            x.getDateRaw().getTime()<=toDate.getTime())
-                    .toList();
+            try{
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                Date fromDate = formatter.parse(from);
+                Date toDate = formatter.parse(to);
+
+                messages = messages.stream()
+                        .filter(x->
+                                x.getDateRaw().getTime()>=fromDate.getTime())
+                        .filter(x->
+                                x.getDateRaw().getTime()<=toDate.getTime())
+                        .toList();
+                model.addAttribute("from", from);
+                model.addAttribute("to", to);
+            }catch (Exception e){
+                logger.log(Level.SEVERE, "Error while getting dates from " + from + " to " + to, e);
+            }
+
         }
 
         Map<String, Map<String, List<ChatMessage>>> groupedMessages = messages.stream()
@@ -82,6 +96,7 @@ public class MainController {
         model.addAttribute("messages", res);
         model.addAttribute("headers", headers);
         model.addAttribute("groupSearch", groupName);
+
         return "index";
     }
 }
