@@ -100,7 +100,7 @@ public class Bot extends TelegramLongPollingBot {
                 chatName = matcher.group(1);
             }
             else{
-                pattern = Pattern.compile("SL KIDS\\s*(\\d+)");
+                pattern = Pattern.compile("KIDS\\s*(\\d+)");
                 matcher = pattern.matcher(chatName);
                 if(matcher.find()) {
                     chatName = matcher.group(1);
