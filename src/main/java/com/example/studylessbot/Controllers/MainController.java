@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Nullable;
 import java.text.SimpleDateFormat;
@@ -34,6 +35,9 @@ public class MainController {
     );
 
 
+    private long totalPages;
+    private final long itemsPerPage = 10;
+
     @Autowired
     public MainController(MessagesService messageService) {
 
@@ -42,8 +46,13 @@ public class MainController {
     }
 
     @GetMapping("/")
-    public String index(@Nullable String groupName,@Nullable String from,@Nullable String to, Model model) {
-            List<ChatMessage> messages = messageService.getAllMessages().stream().sorted(Comparator.comparing(ChatMessage::getDate)).toList();
+    public String index(@Nullable String groupName, @Nullable String from, @Nullable String to, @RequestParam(defaultValue = "0") long pageNum, Model model) {
+        totalPages = messageService.getAllMessages().size() /itemsPerPage;
+
+        if(pageNum>totalPages || pageNum<0){
+            return "redirect:/";
+        }
+        List<ChatMessage> messages = messageService.getAllMessages().stream().sorted(Comparator.comparing(ChatMessage::getDate)).skip((long) pageNum *itemsPerPage).limit(itemsPerPage).toList();
 
 
         if(groupName!=null) {
