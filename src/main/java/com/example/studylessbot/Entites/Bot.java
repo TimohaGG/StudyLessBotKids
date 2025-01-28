@@ -4,8 +4,6 @@ import com.example.studylessbot.Controllers.MainController;
 import com.example.studylessbot.Services.MessagesService;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -45,11 +43,13 @@ public class Bot extends TelegramLongPollingBot {
             }
 
             Message message = update.getMessage();
-            String chatName = extractChat(message.getChat().getTitle());
+            ChatGroup group = getGroup(message.getChat().getTitle());
+
             List<ChatMessage> msgs = new ArrayList<>();
             ChatMessage tmp = new ChatMessage();
-            tmp.setDate(new Date((long    )message.getDate()*1000));
-            tmp.setGroupNumber(chatName);
+            tmp.setDate(new Date((long)message.getDate()*1000));
+            tmp.setGroup(group);
+
             if(message.hasPoll()){
                 tmp.setMessageType(MessageType.POLL);
                 msgs.add(tmp);
@@ -124,6 +124,18 @@ public class Bot extends TelegramLongPollingBot {
         return "7712861655:AAGsdpMocRxgtaNVUqCkE8XS7pP92dbTKyc";
     }
 
+    private ChatGroup getGroup(String chatName){
+        ChatGroup tmp = messagesService.hasGroup(chatName);
+        if(tmp!=null){
+            return tmp;
+        }
+        else{
+            ChatGroup group = new ChatGroup();
+            group.setName(chatName);
+            messagesService.saveGroup(group);
+            return group;
+        }
+    }
 
 
 }

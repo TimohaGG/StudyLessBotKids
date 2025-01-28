@@ -44,11 +44,11 @@
             <div class="accordion" id="accordionExample" >
                 <div class="accordion-item" th:each="message:${messages}">
                     <h2 class="accordion-header">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" th:data-bs-target="'#'+${message.getKey().replaceAll(' ','')}" aria-expanded="true" aria-controls="collapseOne" th:text="${message.getKey()}">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" th:data-bs-target="'#'+${message.getKey().getId()}" aria-expanded="true" aria-controls="collapseOne" th:text="${message.getKey().getName()}">
 
                         </button>
                     </h2>
-                    <div th:id="${message.getKey().replaceAll(' ','')}" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div th:id="${message.getKey().getId()}" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                         <div class="accordion-body">
                             <table class="table">
                                 <thead>
@@ -69,6 +69,27 @@
                 </div>
 
             </div>
+        </div>
+        <div class="col-12 text-center">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center mt-5" >
+                    <li class="page-item" >
+                        <a class="page-link" aria-label="Previous" th:href="'/?pageNum=' + ${prevPage}">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="i :${#numbers.sequence(0,totalPages)}">
+                        <a class="page-link active" th:href="'/?pageNum=' + ${i} + '&from=' + ${from} + '&to=' +${to}" th:text="${i+1}" th:if="${i==currentPage}"></a>
+                        <a class="page-link" th:href="'/?pageNum=' + ${i} + '&from=' + ${from} + '&to=' +${to}" th:text="${i+1}" th:unless="${i==currentPage}"></a>
+                    </li>
+
+                    <li class="page-item">
+                        <a class="page-link" th:href="'/?pageNum=' + ${nextPage}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 

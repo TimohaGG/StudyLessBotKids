@@ -1,9 +1,6 @@
 package com.example.studylessbot.Entites;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -19,21 +16,29 @@ public class ChatMessage {
 
     private MessageType messageType;
     private Date date;
-    private String groupNumber;
-
+    @ManyToOne
+    private ChatGroup group;
 
     public ChatMessage() {
 
+    }
+
+    public ChatGroup getGroup() {
+        return group;
+    }
+
+    public void setGroup(ChatGroup group) {
+        this.group = group;
     }
 
     public long getId() {
         return id;
     }
 
-    public ChatMessage(MessageType messageType, Date date, String groupNumber) {
+    public ChatMessage(MessageType messageType, Date date, ChatGroup group) {
         this.messageType = messageType;
         this.date = date;
-        this.groupNumber = groupNumber;
+        this.group = group;
     }
 
 
@@ -45,9 +50,9 @@ public class ChatMessage {
         this.date = date;
     }
 
-    public void setGroupNumber(String groupNumber) {
-        this.groupNumber = groupNumber;
-    }
+//    public void setGroupNumber(String groupNumber) {
+//        this.groupNumber = groupNumber;
+//    }
 
     public MessageType getMessageType() {
         return messageType;
@@ -75,9 +80,9 @@ public class ChatMessage {
 
         return calendar.getTime();
     }
-    public String getGroupNumber() {
-        return groupNumber;
-    }
+//    public String getGroupNumber() {
+//        return groupNumber;
+//    }
 
     public static String getFormatedDate(Date date){
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE dd/MM/yyyy");
