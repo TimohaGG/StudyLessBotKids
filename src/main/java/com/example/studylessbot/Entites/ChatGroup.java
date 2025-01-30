@@ -16,6 +16,9 @@ public class ChatGroup {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "group", cascade = CascadeType.ALL)
     private List<ChatMessage> chatMessages;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Teacher teacher;
+
     public ChatGroup() {
     }
 
@@ -23,10 +26,20 @@ public class ChatGroup {
         this.chatMessages = chatMessages;
     }
 
-    public ChatGroup(long id, String name, List<ChatMessage> chatMessages) {
+    public ChatGroup(long id, String name, List<ChatMessage> chatMessages, Teacher teacher) {
         this.id = id;
         this.name = name;
         this.chatMessages = chatMessages;
+        this.teacher = teacher;
+
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
     }
 
     public String getName() {

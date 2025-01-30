@@ -4,9 +4,13 @@ import com.example.studylessbot.Controllers.MainController;
 import com.example.studylessbot.Services.MessagesService;
 
 
+import org.checkerframework.checker.regex.qual.Regex;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChat;
+import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -42,8 +46,10 @@ public class Bot extends TelegramLongPollingBot {
                 return;
             }
 
+
             Message message = update.getMessage();
-            ChatGroup group = getGroup(message.getChat().getTitle());
+
+            ChatGroup group = getGroup(message.getChat().getTitle(), getChatDescription(String.valueOf(message.getChat().getId())));
 
             List<ChatMessage> msgs = new ArrayList<>();
             ChatMessage tmp = new ChatMessage();
@@ -85,31 +91,20 @@ public class Bot extends TelegramLongPollingBot {
         }
 
 
+
+
+    }
+    public String getChatDescription(String chatId) {
+        try {
+            Chat chat = execute(new GetChat(chatId));
+            return chat.getDescription() != null ? chat.getDescription() : "No description available";
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+            return "Error fetching chat description";
+        }
     }
 
-    private String extractChat(String chatName){
-        Pattern pattern = Pattern.compile("\\,(\\d+)");
-        Matcher matcher = pattern.matcher(chatName);
-        if(matcher.find()) {
-            chatName = matcher.group(1);
-        }
-        else{
-            pattern = Pattern.compile("група\\s*(\\d+)");
-            matcher = pattern.matcher(chatName);
-            if(matcher.find()) {
-                chatName = matcher.group(1);
-            }
-            else{
-                pattern = Pattern.compile("KIDS\\s*(\\d+)");
-                matcher = pattern.matcher(chatName);
-                if(matcher.find()) {
-                    chatName = matcher.group(1);
-                }
-            }
 
-        }
-        return chatName;
-    }
 
 
     @Override
@@ -124,7 +119,7 @@ public class Bot extends TelegramLongPollingBot {
         return "7712861655:AAGsdpMocRxgtaNVUqCkE8XS7pP92dbTKyc";
     }
 
-    private ChatGroup getGroup(String chatName){
+    private ChatGroup getGroup(String chatName, String description){
         ChatGroup tmp = messagesService.hasGroup(chatName);
         if(tmp!=null){
             return tmp;
@@ -132,8 +127,32 @@ public class Bot extends TelegramLongPollingBot {
         else{
             ChatGroup group = new ChatGroup();
             group.setName(chatName);
+
+            group.setTeacher(findTeacher(description));
+
             messagesService.saveGroup(group);
             return group;
+        }
+    }
+
+    private Teacher findTeacher(String description){
+        if(description==null)
+            return null;
+        Pattern teacherPatt = Pattern.compile("@\\w+");
+        Matcher matcher = teacherPatt.matcher(description);
+        Teacher teacher;
+        if(matcher.find()){
+            teacher = messagesService.getTeacher(matcher.group());
+            if(teacher!=null){
+                return teacher;
+            }
+            teacher = new Teacher();
+            teacher.setName(matcher.group());
+            messagesService.saveTeacher(teacher);
+            return teacher;
+        }
+        else{
+            return null;
         }
     }
 

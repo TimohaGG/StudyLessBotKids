@@ -2,8 +2,10 @@ package com.example.studylessbot.Services;
 
 import com.example.studylessbot.Entites.ChatMessage;
 import com.example.studylessbot.Entites.ChatGroup;
+import com.example.studylessbot.Entites.Teacher;
 import com.example.studylessbot.Repos.IGroupsRepos;
 import com.example.studylessbot.Repos.MessagesRepos;
+import com.example.studylessbot.Repos.iTeacherRepos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +16,12 @@ public class MessagesService {
 
     private final MessagesRepos messagesRepos;
     private final IGroupsRepos iGroupsRepos;
+    private final iTeacherRepos iTeacherRepos;
     @Autowired
-    public MessagesService(MessagesRepos messagesRepos, IGroupsRepos iGroupsRepos) {
+    public MessagesService(MessagesRepos messagesRepos, IGroupsRepos iGroupsRepos, iTeacherRepos iTeacherRepos) {
         this.messagesRepos = messagesRepos;
         this.iGroupsRepos = iGroupsRepos;
+        this.iTeacherRepos = iTeacherRepos;
     }
 
     public List<ChatMessage> getAllMessages() {
@@ -42,5 +46,13 @@ public class MessagesService {
 
     public List<ChatGroup> getAllGroups(){
         return iGroupsRepos.findAll();
+    }
+
+    public Teacher getTeacher(String teacherName) {
+        return iTeacherRepos.findAll().stream().filter(x->x.getName().equals(teacherName)).findFirst().orElse(null);
+    }
+
+    public void saveTeacher(Teacher teacher) {
+        iTeacherRepos.save(teacher);
     }
 }
