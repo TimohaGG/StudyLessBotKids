@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MessagesService {
@@ -54,5 +55,13 @@ public class MessagesService {
 
     public void saveTeacher(Teacher teacher) {
         iTeacherRepos.save(teacher);
+    }
+
+    public List<String> getTeachersNames(){
+        return iTeacherRepos.findAll().stream().map(Teacher::getName).toList();
+    }
+
+    public Teacher getDefaultTeacher(){
+        return iTeacherRepos.findAll().stream().filter(x->x.getName().equals("No Teacher")).findFirst().orElse(null);
     }
 }

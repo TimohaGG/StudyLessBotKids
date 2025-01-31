@@ -137,7 +137,7 @@ public class Bot extends TelegramLongPollingBot {
 
     private Teacher findTeacher(String description){
         if(description==null)
-            return null;
+            return messagesService.getDefaultTeacher();
         Pattern teacherPatt = Pattern.compile("@\\w+");
         Matcher matcher = teacherPatt.matcher(description);
         Teacher teacher;
@@ -152,7 +152,7 @@ public class Bot extends TelegramLongPollingBot {
             return teacher;
         }
         else{
-            return null;
+            return messagesService.getDefaultTeacher();
         }
     }
 
